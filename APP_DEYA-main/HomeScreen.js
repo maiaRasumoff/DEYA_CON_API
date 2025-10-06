@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, TextInput, ScrollView, SafeAreaView, Alert } from 'react-native';
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import supabase from './lib/supabase'; // Ajusta la ruta si es necesario
+import { usePopups } from './src/hooks';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getValueOrPlaceholder, getImageOrPlaceholder } from './src/utils/dataHelpers';
 
 // Simula datos de usuario
 const useUserData = () => ({ name: 'User', location: 'Parque Patricios, Bs. As.' });
@@ -67,9 +68,12 @@ const FilterChips = ({ chips, selected, onSelect }) => (
 
 const PopupCard = ({ popup, onPress, onFavorite }) => (
   <View style={styles.popupCard}>
-    <Image source={{ uri: popup.imagen }} style={styles.popupImage} />
-    <Text style={styles.popupName}>{popup.nombre}</Text>
-    <Text style={styles.popupAddress}>{popup.ubicacion}</Text>
+    <Image 
+      source={{ uri: getImageOrPlaceholder(popup.imagen, 'https://via.placeholder.com/200x100?text=Sin+Imagen') }} 
+      style={styles.popupImage} 
+    />
+    <Text style={styles.popupName}>{getValueOrPlaceholder(popup.nombre, 'Sin nombre')}</Text>
+    <Text style={styles.popupAddress}>{getValueOrPlaceholder(popup.ubicacion, 'Ubicación no disponible')}</Text>
     <View style={styles.popupCardFooter}>
       <TouchableOpacity style={styles.verMasButton} onPress={onPress}>
         <Text style={styles.verMasText}>Ver más</Text>
@@ -79,7 +83,7 @@ const PopupCard = ({ popup, onPress, onFavorite }) => (
       </TouchableOpacity>
     </View>
   </View>
-);
+ );
 
 const TabBar = ({ current, onTab }) => (
   <View style={styles.tabBar}>
@@ -111,89 +115,38 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const { name, location } = useUserData();
   const [search, setSearch] = useState('');
-  const [barriosData, setBarriosData] = useState([]); // Estado para los barrios
-  const [barrios, setBarrios] = useState(['Todos los barrios']); // Chips dinámicos
+  const [barrios, setBarrios] = useState(['Todos los barrios']); // Chips estáticos por ahora
   const [selectedBarrio, setSelectedBarrio] = useState('Todos los barrios');
-  const [popup, setPopups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Usar el hook personalizado para obtener popups
+  const { popups, loading, error, refetch } = usePopups();
 
-  // Obtener los barrios al inicio y poblar chips
+  // Por ahora usamos barrios estáticos, pero puedes implementar la lógica de barrios dinámicos después
   useEffect(() => {
-    const fetchBarrios = async () => {
-      try {
-        const { data, error } = await supabase.from('barrio').select('*');
-        if (error) {
-          console.error('Error al obtener barrios:', error.message, JSON.stringify(error));
-          setBarriosData([]);
-          setBarrios(['Todos los barrios']);
-          // Si quieres mostrar un mensaje al usuario, puedes usar un estado extra:
-          // setErrorBarrios('No se pudieron cargar los barrios. Intenta más tarde.');
-        } else if (!data || !Array.isArray(data) || data.length === 0) {
-          console.warn('No se recibieron datos de barrios o el array está vacío:', data);
-          setBarriosData([]);
-          setBarrios(['Todos los barrios']);
-        } else {
-          setBarriosData(data);
-          setBarrios(['Todos los barrios', ...(data || []).map(b => b.nombrebarrio)]);
-          console.log('Barrios recibidos:', data);
-        }
-      } catch (err) {
-        console.error('Excepción al obtener barrios:', err.message, JSON.stringify(err));
-        setBarriosData([]);
-        setBarrios(['Todos los barrios']);
-        // setErrorBarrios('No se pudieron cargar los barrios. Intenta más tarde.');
-      }
-    };
-    fetchBarrios();
+    // Aquí puedes implementar la lógica para obtener barrios dinámicos si es necesario
+    // Por ahora mantenemos los barrios estáticos
   }, []);
 
-  const fetchPopups = useCallback(async () => {
-    setLoading(true);
-    let query = supabase.from('popup').select('*');
+  // La función fetchPopups ahora se maneja automáticamente con el hook usePopups
+  // El filtrado por barrio se puede implementar después cuando tengas la lógica de barrios dinámicos
 
-    if (selectedBarrio !== 'Todos los barrios') {
-      const barrioObj = barriosData.find(b => b.nombrebarrio === selectedBarrio);
-      console.log('Filtrando por barrio seleccionado:', selectedBarrio);
-      console.log('Objeto barrio encontrado:', barrioObj);
-
-      if (barrioObj && typeof barrioObj.idbarrio === 'number') {
-        query = query.eq('idbarrio', barrioObj.idbarrio);
-      } else {
-        console.warn('No se encontró id válido para el barrio');
-        setPopups([]);
-        setLoading(false);
-        return;
-      }
-    }
-
-    const { data: popup, error: popupError } = await query;
-    console.log('popup:', popup);
-    console.log('popupError:', popupError);
-    if (popupError) {
-      console.error('Error fetching popup:', popupError.message);
-      setPopups([]);
-    } else {
-      console.log('Popups recibidos del backend:', popup);
-      setPopups(popup || []);
-    }
-    setLoading(false);
-  }, [selectedBarrio, barriosData]);
-
-  useEffect(() => {
-    fetchPopups();
-  }, [fetchPopups]);
+  // El hook usePopups se ejecuta automáticamente al montar el componente
+  // No necesitamos un useEffect adicional
 
   const handleFavorite = async (popup) => {
+    // Por ahora solo actualizamos el estado local
+    // Aquí puedes implementar la lógica para actualizar favoritos en tu API
     const updated = !popup.isFavorite;
-    setPopups((prev) => prev.map(p => p.idpopup === popup.idpopup ? { ...p, isFavorite: updated } : p));
-    await supabase.from('popup').update({ isFavorite: updated }).eq('idpopup', popup.idpopup);
+    // TODO: Implementar actualización de favoritos en tu API
+    console.log('Toggle favorite for popup:', popup.idpopup, 'to:', updated);
   };
 
   // DEBUG LOGS para depuración en tiempo real
-  console.log('barriosData', barriosData);
   console.log('barrios', barrios);
   console.log('selectedBarrio', selectedBarrio);
-  console.log('popup', popup);
+  console.log('popups', popups);
+  console.log('loading', loading);
+  console.log('error', error);
 
   // Chips de barrios: fallback si no hay datos
   const chipsToShow = barrios.length > 1 ? barrios : ['Todos los barrios', 'Flores', 'Palermo', 'Recoleta'];
@@ -211,25 +164,35 @@ const HomeScreen = () => {
               <Text style={styles.sectionLink}>Ver todo</Text>
             </TouchableOpacity>
           </View>
-          {loading ? (
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>Cargando...</Text>
-          ) : popup.length === 0 ? (
-            <Text style={{ textAlign: 'center', marginTop: 20 }}>No hay pop-ups disponibles 😢</Text>
+          {error ? (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>😢 {error}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+                <Text style={styles.retryButtonText}>Reintentar</Text>
+              </TouchableOpacity>
+            </View>
+          ) : loading ? (
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>Cargando popups...</Text>
+            </View>
+          ) : popups.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No hay pop-ups disponibles 😢</Text>
+              <Text style={styles.emptySubtext}>Intenta más tarde o verifica tu conexión</Text>
+            </View>
           ) : (
             <FlatList
-              data={popup}
+              data={popups}
               horizontal
               showsHorizontalScrollIndicator={false}
-              keyExtractor={item => item.idpopup?.toString()}
-              renderItem={({ item }) =>
-                item.nombre && item.imagen ? (
-                  <PopupCard
-                    popup={item}
-                    onPress={() => navigation.navigate('PopupDetailScreen', { popup: item })}
-                    onFavorite={() => handleFavorite(item)}
-                  />
-                ) : null
-              }
+              keyExtractor={item => item.idpopup?.toString() || item.id?.toString()}
+              renderItem={({ item }) => (
+                <PopupCard
+                  popup={item}
+                  onPress={() => navigation.navigate('PopupDetailScreen', { popupId: item.idpopup || item.id })}
+                  onFavorite={() => handleFavorite(item)}
+                />
+              )}
               contentContainerStyle={{ paddingHorizontal: 8 }}
               style={{ minHeight: 260 }}
             />
@@ -428,6 +391,54 @@ const styles = StyleSheet.create({
     color: '#BDBDBD',
     marginTop: 2,
     fontWeight: '500',
+  },
+  errorContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#FF5BA0',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#34A853',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+    paddingHorizontal: 20,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#34A853',
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 40,
+    paddingHorizontal: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#FF5BA0',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#888',
+    textAlign: 'center',
   },
 });
 

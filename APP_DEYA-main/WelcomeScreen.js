@@ -1,34 +1,95 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import * as Font from 'expo-font';
 
 const WelcomeScreen = ({ navigation }) => {
+  const float1 = useRef(new Animated.Value(0)).current;
+  const float2 = useRef(new Animated.Value(0)).current;
+  const float3 = useRef(new Animated.Value(0)).current;
+  const float4 = useRef(new Animated.Value(0)).current;
+  const fontsLoadedRef = useRef(false);
+
+  useEffect(() => {
+    let isMounted = true;
+    const loadFonts = async () => {
+      try {
+        await Font.loadAsync({
+          Coolvetica: require('./assets/fonts/Coolvetica.ttf'),
+          Neuton: require('./assets/fonts/Neuton-Regular.ttf'),
+        });
+        if (isMounted) {
+          fontsLoadedRef.current = true;
+        }
+      } catch (e) {}
+    };
+    loadFonts();
+
+    const makeFloat = (anim, delayMs) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, { toValue: -12, duration: 1500, delay: delayMs, useNativeDriver: true, easing: undefined }),
+          Animated.timing(anim, { toValue: 0, duration: 1500, useNativeDriver: true, easing: undefined }),
+        ])
+      ).start();
+    };
+    makeFloat(float1, 0);
+    makeFloat(float2, 300);
+    makeFloat(float3, 600);
+    makeFloat(float4, 900);
+
+    return () => { isMounted = false; };
+  }, [float1, float2, float3, float4]);
+
   return (
     <View style={styles.container}>
-      {/* Logo arriba */}
+      <LinearGradient
+        colors={["#FFE5E1", "#FFFFFF"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
+
       <Image source={require('./assets/logo.png')} style={styles.logo} resizeMode="contain" />
 
-      {/* Imagen circular central con íconos decorativos */}
       <View style={styles.imageContainer}>
+        <BlurView intensity={30} tint="light" style={styles.blurBackdrop} />
         <Image source={require('./assets/popup.jpg')} style={styles.popupImage} />
-        {/* Íconos decorativos (pueden ser imágenes o vistas simuladas) */}
-        <View style={[styles.icon, styles.iconTopRight]} />
-        <View style={[styles.icon, styles.iconBottomLeft]} />
-        <View style={[styles.icon, styles.iconBottomRight]} />
+
+        <Animated.Image
+          source={require('./assets/popupCherry.png')}
+          style={[styles.floatingImg, styles.floatTopLeft, { transform: [{ translateY: float1 }] }]}
+          resizeMode="contain"
+        />
+        <Animated.Image
+          source={require('./assets/popupLoewe.png')}
+          style={[styles.floatingImg, styles.floatTopRight, { transform: [{ translateY: float2 }] }]}
+          resizeMode="contain"
+        />
+        <Animated.Image
+          source={require('./assets/popupRosa.png')}
+          style={[styles.floatingImg, styles.floatBottomLeft, { transform: [{ translateY: float3 }] }]}
+          resizeMode="contain"
+        />
+        <Animated.Image
+          source={require('./assets/popupLacoste')}
+          style={[styles.floatingImg, styles.floatBottomRight, { transform: [{ translateY: float4 }] }]}
+          resizeMode="contain"
+        />
       </View>
 
-      {/* Título y subtítulo */}
-      <Text style={styles.title}>Pop-ups cerca tuyo.</Text>
-      <Text style={styles.subtitle}>
+      <Text style={[styles.title, { fontFamily: 'Coolvetica' }]}>POP-UPS CERCA TUYO</Text>
+      <Text style={[styles.subtitle, { fontFamily: 'Neuton' }]}>
         Deyá te muestra dónde y cuándo encontrarlos, mientras sumás puntos por visitarlos.
       </Text>
 
-      {/* Botones */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('Register')}> 
-          <Text style={styles.registerButtonText}>Registrarse</Text>
+          <Text style={[styles.registerButtonText, { fontFamily: 'Neuton' }]}>Registrarse</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+          <Text style={[styles.loginButtonText, { fontFamily: 'Neuton' }]}>Iniciar Sesión</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -40,7 +101,7 @@ const ICON_SIZE = 36;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 48,
@@ -57,6 +118,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  blurBackdrop: {
+    position: 'absolute',
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    overflow: 'hidden',
+  },
   popupImage: {
     width: 220,
     height: 220,
@@ -69,38 +137,22 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  icon: {
+  floatingImg: {
     position: 'absolute',
-    width: ICON_SIZE,
-    height: ICON_SIZE,
-    borderRadius: ICON_SIZE / 2,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#eee',
-    // Simulación de ícono: podés reemplazar por <Image ... />
+    width: 90,
+    height: 90,
   },
-  iconTopRight: {
-    top: 10,
-    right: -18,
-    backgroundColor: '#FDE68A', // Amarillo
-  },
-  iconBottomLeft: {
-    bottom: 10,
-    left: -18,
-    backgroundColor: '#A7F3D0', // Verde agua
-  },
-  iconBottomRight: {
-    bottom: 10,
-    right: -18,
-    backgroundColor: '#FBCFE8', // Rosa claro
-  },
+  floatTopLeft: { top: -10, left: -30 },
+  floatTopRight: { top: -20, right: -30 },
+  floatBottomLeft: { bottom: -10, left: -28 },
+  floatBottomRight: { bottom: -14, right: -26 },
   title: {
-    fontSize: 22,
-    fontWeight: '600',
+    fontSize: 28,
     textAlign: 'center',
     marginTop: 24,
     marginBottom: 8,
-    color: '#222',
+    color: '#111',
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 15,

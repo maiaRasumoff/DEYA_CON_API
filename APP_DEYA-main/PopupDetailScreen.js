@@ -1,348 +1,354 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
+  StyleSheet,
+  ScrollView,
   Image,
   TouchableOpacity,
-  ScrollView,
   SafeAreaView,
-  StyleSheet,
-  Dimensions,
+  ActivityIndicator,
 } from 'react-native';
+import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import dayjs from 'dayjs';
+import { usePopupDetail } from './src/hooks';
+import { getValueOrPlaceholder, getImageOrPlaceholder, formatPrice } from './src/utils/dataHelpers';
 
-const { width } = Dimensions.get('window');
-
-// Header con botón de retroceso y título centrado
-const HeaderWithBack = ({ title }) => {
+const PopupDetailScreen = () => {
   const navigation = useNavigation();
-  return (
-    <View style={styles.headerContainer}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Icon name="arrow-left" size={26} color="#222" />
-      </TouchableOpacity>
-      <Text style={styles.headerTitle}>{title}</Text>
-      <View style={{ width: 40 }} />
-    </View>
-  );
-};
+  const route = useRoute();
+  const { popupId } = route.params;
 
-// Galería horizontal de imágenes
-const Gallery = ({ images }) => {
-  if (!images || images.length === 0) return null;
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.galleryScroll}>
-      {images.map((img, idx) => (
-        <Image
-          key={idx}
-          source={{ uri: img }}
-          style={styles.galleryImage}
-          resizeMode="cover"
-        />
-      ))}
-      {images.length > 5 && (
-        <View style={styles.galleryMore}>
-          <Text style={styles.galleryMoreText}>{`+${images.length - 5}`}</Text>
+  const { popupDetail, loading, error, refetch } = usePopupDetail(popupId);
+
+  const handleGoBack = () => {
+    navigation.goBack();
+  };
+
+  const handleFavorite = () => {
+    // TODO: Implementar lógica de favoritos
+    console.log('Toggle favorite for popup:', popupId);
+  };
+
+  const renderInfoRow = (icon, label, value, isImportant = false) => {
+    if (!value) return null;
+    
+    return (
+      <View style={styles.infoRow}>
+        <View style={styles.infoIcon}>
+          <Ionicons name={icon} size={20} color="#34A853" />
         </View>
-      )}
-    </ScrollView>
-  );
-};
-
-// Tabs de contenido
-const PopupTabs = ({ popup }) => {
-  const [tab, setTab] = useState(0);
-  const tabColor = (i) => (tab === i ? styles.tabActive : styles.tabInactive);
-
-  // Galería: por ahora, repetir la imagen principal
-  const galleryImages = popup.imagen ? Array(5).fill(popup.imagen) : [];
-
-  return (
-    <View style={{ flex: 1 }}>
-      {/* Tabs */}
-      <View style={styles.tabsContainer}>
-        <TouchableOpacity style={styles.tabBtn} onPress={() => setTab(0)}>
-          <Text style={[styles.tabText, tabColor(0)]}>Detalles</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabBtn} onPress={() => setTab(1)}>
-          <Text style={[styles.tabText, tabColor(1)]}>Fecha</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabBtn} onPress={() => setTab(2)}>
-          <Text style={[styles.tabText, tabColor(2)]}>Visitado</Text>
-        </TouchableOpacity>
-      </View>
-      {/* Contenido de cada tab */}
-      {tab === 0 && (
-        <View style={styles.tabContent}>
-          <Text style={styles.sectionTitle}>Detalles del pop-up</Text>
-          <Text style={styles.sectionText} numberOfLines={5} ellipsizeMode="tail">
-            {popup.detalle ? popup.detalle : 'No cargado'}
+        <View style={styles.infoContent}>
+          <Text style={styles.infoLabel}>{label}</Text>
+          <Text style={[styles.infoValue, isImportant && styles.infoValueImportant]}>
+            {value}
           </Text>
-          {!popup.detalle && <Text style={styles.sectionLeerMas}>No cargado</Text>}
         </View>
-      )}
-      {tab === 1 && (
-        <View style={styles.tabContent}>
-          <Gallery images={galleryImages} />
-          <Text style={styles.sectionTitle}>Fecha del pop-up</Text>
-          <View style={styles.dateRow}>
-            <View style={styles.dateCol}>
-              <Text style={styles.dateLabel}>Desde</Text>
-              <View style={styles.dateInput}>
-                <Icon name="calendar" size={18} color="#888" style={{ marginRight: 6 }} />
-                <Text style={styles.dateText}>
-                  {popup.fecha_inicio ? dayjs(popup.fecha_inicio).format('DD/MM/YYYY') : 'No cargado'}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.dateCol}>
-              <Text style={styles.dateLabel}>Hasta</Text>
-              <View style={styles.dateInput}>
-                <Icon name="calendar" size={18} color="#888" style={{ marginRight: 6 }} />
-                <Text style={styles.dateText}>
-                  {popup.fecha_fin ? dayjs(popup.fecha_fin).format('DD/MM/YYYY') : 'No cargado'}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
-      )}
-      {tab === 2 && (
-        <View style={styles.tabContent}>
-          {/* Por ahora vacío, funcional */}
-        </View>
-      )}
-    </View>
-  );
-};
+      </View>
+    );
+  };
 
-const PopupDetailScreen = ({ route }) => {
-  const popup = route?.params?.popup || {};
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#222" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Detalle del Popup</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#34A853" />
+          <Text style={styles.loadingText}>Cargando detalles...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <HeaderWithBack title="Detalles del pop-up" />
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 110 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Imagen principal */}
-          <Image
-            source={popup.imagen ? { uri: popup.imagen } : require('./assets/popup.jpg')}
-            style={styles.mainImage}
-            resizeMode="cover"
-          />
-          {/* Título y dirección */}
-          <View style={styles.infoContainer}>
-            <Text style={styles.title}>{popup.nombre || 'No cargado'}</Text>
-            <View style={styles.locationRow}>
-              <Icon name="map-marker" size={18} color="#22C55E" style={{ marginRight: 4 }} />
-              <Text style={styles.locationText}>{popup.ubicacion || 'No cargado'}</Text>
-            </View>
-          </View>
-          {/* Tabs */}
-          <PopupTabs popup={popup} />
-        </ScrollView>
-        {/* Botón fijo */}
-        <View style={styles.fixedButtonContainer}>
-          <TouchableOpacity style={styles.favButton} activeOpacity={0.85}>
-            <Icon name="heart-outline" size={22} color="#fff" style={{ marginRight: 8 }} />
-            <Text style={styles.favButtonText}>Agregar a Favoritos</Text>
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#222" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Detalle del Popup</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={styles.errorContainer}>
+          <Ionicons name="sad-outline" size={64} color="#FF5BA0" />
+          <Text style={styles.errorText}>😢 {error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+            <Text style={styles.retryButtonText}>Reintentar</Text>
           </TouchableOpacity>
         </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!popupDetail) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#222" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Detalle del Popup</Text>
+          <View style={styles.placeholder} />
+        </View>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>No se encontró información del popup</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+            <Text style={styles.retryButtonText}>Reintentar</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#222" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Detalle del Popup</Text>
+        <TouchableOpacity onPress={handleFavorite} style={styles.favoriteButton}>
+          <Ionicons 
+            name={popupDetail.isFavorite ? 'heart' : 'heart-outline'} 
+            size={24} 
+            color="#FF5BA0" 
+          />
+        </TouchableOpacity>
       </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Imagen principal */}
+        <Image
+          source={{ 
+            uri: getImageOrPlaceholder(popupDetail.imagen, 'https://via.placeholder.com/400x250?text=Sin+Imagen') 
+          }}
+          style={styles.mainImage}
+          resizeMode="cover"
+        />
+
+        {/* Información principal */}
+        <View style={styles.mainInfo}>
+          <Text style={styles.popupName}>{getValueOrPlaceholder(popupDetail.nombre, 'Sin nombre')}</Text>
+          <Text style={styles.popupDescription}>
+            {getValueOrPlaceholder(popupDetail.descripcion, 'Sin descripción disponible')}
+          </Text>
+        </View>
+
+        {/* Información detallada */}
+        <View style={styles.detailsSection}>
+          <Text style={styles.sectionTitle}>Información del Popup</Text>
+          
+          {renderInfoRow('location', 'Ubicación', popupDetail.ubicacion, true)}
+          {renderInfoRow('business', 'Barrio', popupDetail.nombreBarrio)}
+          {renderInfoRow('time', 'Horarios', popupDetail.horarios)}
+          {renderInfoRow('call', 'Teléfono', popupDetail.telefono)}
+          {renderInfoRow('mail', 'Email', popupDetail.email)}
+          {renderInfoRow('globe', 'Sitio web', popupDetail.sitioWeb)}
+          
+          <View style={styles.infoRow}>
+            <View style={styles.infoIcon}>
+              <MaterialIcons name="attach-money" size={20} color="#34A853" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Precio</Text>
+              <Text style={styles.infoValue}>{formatPrice(popupDetail.precio)}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Información del usuario si existe */}
+        {popupDetail.usuario && (
+          <View style={styles.detailsSection}>
+            <Text style={styles.sectionTitle}>Información del Usuario</Text>
+            {renderInfoRow('person', 'Nombre', popupDetail.usuario.nombre)}
+            {renderInfoRow('mail', 'Email', popupDetail.usuario.email)}
+            {renderInfoRow('call', 'Teléfono', popupDetail.usuario.telefono)}
+          </View>
+        )}
+
+        {/* Información adicional */}
+        {popupDetail.informacionAdicional && (
+          <View style={styles.detailsSection}>
+            <Text style={styles.sectionTitle}>Información Adicional</Text>
+            <Text style={styles.additionalInfo}>
+              {popupDetail.informacionAdicional}
+            </Text>
+          </View>
+        )}
+
+        {/* Botón de acción */}
+        <View style={styles.actionSection}>
+          <TouchableOpacity style={styles.contactButton}>
+            <Ionicons name="call" size={20} color="#fff" />
+            <Text style={styles.contactButtonText}>Contactar</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
   },
-  headerContainer: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 56,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#eee',
-    backgroundColor: '#fff',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
   backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    padding: 8,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#222',
+    flex: 1,
     textAlign: 'center',
+  },
+  favoriteButton: {
+    padding: 8,
+  },
+  placeholder: {
+    width: 40,
+  },
+  content: {
+    flex: 1,
   },
   mainImage: {
     width: '100%',
-    height: width * 0.55,
-    backgroundColor: '#eee',
+    height: 250,
+    backgroundColor: '#F1F5F9',
   },
-  infoContainer: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 18,
-    paddingTop: 16,
-    paddingBottom: 8,
+  mainInfo: {
+    padding: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
-  title: {
-    fontSize: 20,
+  popupName: {
+    fontSize: 24,
     fontWeight: '700',
     color: '#222',
-    marginBottom: 4,
+    marginBottom: 8,
   },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2,
-  },
-  locationText: {
-    fontSize: 14,
+  popupDescription: {
+    fontSize: 16,
     color: '#666',
+    lineHeight: 24,
   },
-  tabsContainer: {
-    flexDirection: 'row',
+  detailsSection: {
+    padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    marginTop: 10,
-    marginHorizontal: 0,
-    backgroundColor: '#fff',
-  },
-  tabBtn: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  tabText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  tabActive: {
-    color: '#B91C1C',
-    borderBottomWidth: 2,
-    borderBottomColor: '#B91C1C',
-    paddingBottom: 2,
-  },
-  tabInactive: {
-    color: '#888',
-    borderBottomWidth: 0,
-    paddingBottom: 2,
-  },
-  tabContent: {
-    paddingHorizontal: 18,
-    paddingVertical: 18,
-    minHeight: 120,
+    borderBottomColor: '#E5E7EB',
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '600',
-    marginBottom: 8,
     color: '#222',
+    marginBottom: 16,
   },
-  sectionText: {
-    fontSize: 14,
-    color: '#444',
-    marginBottom: 6,
-  },
-  sectionLeerMas: {
-    color: '#B91C1C',
-    fontWeight: '500',
-    fontSize: 14,
-  },
-  dateRow: {
+  infoRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
+    alignItems: 'flex-start',
+    marginBottom: 16,
   },
-  dateCol: {
-    flex: 1,
+  infoIcon: {
+    width: 24,
     marginRight: 12,
+    marginTop: 2,
   },
-  dateLabel: {
-    fontSize: 13,
+  infoContent: {
+    flex: 1,
+  },
+  infoLabel: {
+    fontSize: 14,
     color: '#888',
     marginBottom: 4,
   },
-  dateInput: {
+  infoValue: {
+    fontSize: 16,
+    color: '#222',
+    lineHeight: 22,
+  },
+  infoValueImportant: {
+    fontWeight: '600',
+    color: '#34A853',
+  },
+  additionalInfo: {
+    fontSize: 16,
+    color: '#666',
+    lineHeight: 24,
+  },
+  actionSection: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  contactButton: {
+    backgroundColor: '#34A853',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 4,
   },
-  dateText: {
-    fontSize: 15,
-    color: '#222',
+  contactButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 8,
   },
-  galleryScroll: {
-    marginBottom: 14,
-    marginTop: 2,
-    minHeight: 70,
-  },
-  galleryImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-    marginRight: 8,
-    backgroundColor: '#eee',
-  },
-  galleryMore: {
-    width: 64,
-    height: 64,
-    borderRadius: 10,
-    backgroundColor: '#2226',
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  galleryMoreText: {
-    color: '#fff',
-    fontWeight: '700',
+  loadingText: {
     fontSize: 16,
+    color: '#666',
+    marginTop: 16,
   },
-  fixedButtonContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'transparent',
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 18,
-    paddingTop: 8,
+    paddingHorizontal: 20,
   },
-  favButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#B91C1C',
-    borderRadius: 30,
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    shadowColor: '#B91C1C',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.18,
-    shadowRadius: 4,
-    elevation: 2,
+  errorText: {
+    fontSize: 16,
+    color: '#FF5BA0',
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 24,
   },
-  favButtonText: {
+  retryButton: {
+    backgroundColor: '#34A853',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
     color: '#fff',
+    fontSize: 16,
     fontWeight: '600',
-    fontSize: 16,
   },
 });
 
