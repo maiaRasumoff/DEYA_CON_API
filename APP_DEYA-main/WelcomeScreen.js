@@ -73,7 +73,7 @@ const WelcomeScreen = ({ navigation }) => {
           resizeMode="contain"
         />
         <Animated.Image
-          source={require('./assets/popupLacoste')}
+          source={require('./assets/popupLacoste.png')}
           style={[styles.floatingImg, styles.floatBottomRight, { transform: [{ translateY: float4 }] }]}
           resizeMode="contain"
         />
