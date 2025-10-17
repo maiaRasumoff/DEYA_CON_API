@@ -1,5 +1,6 @@
 
 import * as React from 'react';
+import * as Notifications from 'expo-notifications';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -12,10 +13,29 @@ import PopupDetailScreen from './PopupDetailScreen';
 import EstilosScreen from './EstilosScreen';
 import BarriosScreen from './BarriosScreen';
 import PersonalizacionExitosaScreen from './PersonalizacionExitosaScreen';
+import { registerForPushNotificationsAsync } from './src/utils/notifications';
 
 const Stack = createStackNavigator();
 
+// Configure foreground notification behavior
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
 export default function App() {
+  const [expoPushToken, setExpoPushToken] = React.useState(null);
+
+  React.useEffect(() => {
+    (async () => {
+      const token = await registerForPushNotificationsAsync();
+      if (token) setExpoPushToken(token);
+    })();
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen" screenOptions={{ headerShown: false }}>
@@ -32,3 +52,4 @@ export default function App() {
     </NavigationContainer>
   );
 }
+

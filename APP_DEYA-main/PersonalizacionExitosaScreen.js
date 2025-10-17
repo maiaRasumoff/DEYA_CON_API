@@ -10,6 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { sendLocalNotification } from './src/utils/notifications';
 
 const { width, height } = Dimensions.get('window');
 
@@ -41,7 +42,11 @@ const PersonalizacionExitosaScreen = () => {
     ]).start();
   }, []);
 
-  const handleGoHome = () => {
+  const handleGoHome = async () => {
+    await sendLocalNotification(
+      "¡Registro exitoso!",
+      "Tu cuenta fue creada correctamente. Bienvenido/a a la app."
+    );
     // Animación de salida antes de navegar
     Animated.parallel([
       Animated.timing(fadeAnim, {

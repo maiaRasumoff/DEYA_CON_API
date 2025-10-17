@@ -4,7 +4,7 @@
 // Función para obtener la IP automáticamente (opcional)
 const getLocalIP = () => {
   // Puedes cambiar esta IP manualmente si es necesario
-  return '192.168.0.15'; // ← CAMBIA ESTA IP POR LA DE TU COMPUTADORA
+  return '200.73.176.50'; // ← CAMBIA ESTA IP POR LA DE TU COMPUTADORA
 };
 
 export const API_CONFIG = {
