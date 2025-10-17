@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import supabase from './lib/supabase';
@@ -60,12 +60,15 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image source={require('./assets/logo.png')} style={styles.logo} resizeMode="contain" accessibilityLabel="Logo DEYÁ" />
-      </View>
-      <View style={styles.card}>
-        <Text style={styles.title}>Iniciá Sesión</Text>
+    <ImageBackground 
+      source={require('./assets/fondoInicio.png')} 
+      style={styles.mainContainer}
+      resizeMode="cover"
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Inicia Sesión en</Text>
+        <Text style={styles.brandTitle}>Deyá</Text>
+        <View style={styles.card}>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -114,104 +117,110 @@ const LoginScreen = () => {
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Continuar</Text>}
         </TouchableOpacity>
       </View>
-    </View>
+      </View>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#FAD2E1', // soft warm backdrop (fallback to mimic gradient)
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingVertical: 24,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginTop: 0,
-    marginBottom: 16,
-  },
-  logo: {
-    width: 84,
-    height: 60,
+    paddingHorizontal: 20,
+    paddingVertical: 40,
   },
   card: {
-    backgroundColor: '#FFF7EF', // cream center area
-    borderRadius: 36,
-    padding: 28,
-    width: '100%',
-    maxWidth: 420,
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowOffset: { width: 0, height: 6 },
-    shadowRadius: 18,
-    elevation: 6,
+    width: '90%',
+    maxWidth: 400,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
     textAlign: 'center',
-    marginBottom: 22,
-    color: '#111',
-    fontFamily: 'Neuton',
+    marginBottom: 8,
+    marginTop: 40,
+    color: '#333',
+    fontFamily: 'serif',
+    fontWeight: '600',
+  },
+  brandTitle: {
+    fontSize: 28,
+    textAlign: 'center',
+    marginBottom: 32,
+    color: '#333',
+    fontFamily: 'serif',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   input: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 13,
+    paddingVertical: 14,
     fontSize: 16,
     marginBottom: 16,
-    color: '#111',
-    borderWidth: 1.2,
+    color: '#333',
+    borderWidth: 1,
     borderColor: '#333',
+    width: '70%',
+    fontFamily: 'sans-serif',
     shadowColor: '#000',
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.04,
     shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 6,
+    shadowRadius: 4,
     elevation: 2,
-    fontFamily: 'Coolvetica',
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    width: '70%',
   },
   eyeIcon: {
     position: 'absolute',
     right: 16,
-    top: 13,
+    top: 14,
   },
   registerRow: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: 24,
+    width: '100%',
   },
   registerText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#666',
     marginRight: 4,
-    fontFamily: 'Coolvetica',
+    fontFamily: 'sans-serif',
   },
   registerLink: {
-    fontSize: 13,
-    color: '#7A3AF9',
+    fontSize: 14,
+    color: '#E5A5FF',
     fontWeight: '600',
-    fontFamily: 'Coolvetica',
+    fontFamily: 'sans-serif',
   },
   button: {
-    backgroundColor: '#E5A5FF',
+    backgroundColor: '#FEA6F0',
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    marginTop: 8,
+    width: '70%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonText: {
-    color: '#333',
+    color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: '700',
-    fontFamily: 'Coolvetica',
+    fontWeight: 'bold',
+    fontFamily: 'sans-serif',
   },
 });
 

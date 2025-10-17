@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Animated, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import * as Font from 'expo-font';
 
@@ -16,8 +15,8 @@ const WelcomeScreen = ({ navigation }) => {
     const loadFonts = async () => {
       try {
         await Font.loadAsync({
-          Coolvetica: require('./assets/fonts/Coolvetica.ttf'),
-          Neuton: require('./assets/fonts/Neuton-Regular.ttf'),
+          Coolvetica: require('./assets/fonts/Coolvetica Rg.otf'),
+          Neuton: require('./assets/fonts/Neuton-Light.ttf'),
         });
         if (isMounted) {
           fontsLoadedRef.current = true;
@@ -44,11 +43,10 @@ const WelcomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={["#FFE5E1", "#FFFFFF"]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={StyleSheet.absoluteFill}
+      <Image 
+        source={require('./assets/fondoWelcome.png')} 
+        style={styles.backgroundImage} 
+        resizeMode="cover"
       />
 
       <Image source={require('./assets/logo.png')} style={styles.logo} resizeMode="contain" />
@@ -101,11 +99,19 @@ const ICON_SIZE = 36;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 48,
     paddingBottom: 24,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    top: 0,
+    left: -50,
+    right: -50,
+    bottom: 0,
+    width: '150%',
+    height: '100%',
   },
   logo: {
     width: 70,

@@ -22,6 +22,10 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "fonts": [
+      "./assets/Fonts/Coolvetica Rg.otf",
+      "./assets/Fonts/Neuton-Light.ttf"
+    ]
   }
 }

@@ -9,6 +9,9 @@ import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import PopupDetailScreen from './PopupDetailScreen';
+import EstilosScreen from './EstilosScreen';
+import BarriosScreen from './BarriosScreen';
+import PersonalizacionExitosaScreen from './PersonalizacionExitosaScreen';
 
 const Stack = createStackNavigator();
 
@@ -20,6 +23,9 @@ export default function App() {
         <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="EstilosScreen" component={EstilosScreen} />
+        <Stack.Screen name="BarriosScreen" component={BarriosScreen} />
+        <Stack.Screen name="PersonalizacionExitosaScreen" component={PersonalizacionExitosaScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="PopupDetailScreen" component={PopupDetailScreen} />
       </Stack.Navigator>
