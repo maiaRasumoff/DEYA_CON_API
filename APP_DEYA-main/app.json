@@ -6,12 +6,12 @@
     "orientation": "portrait",
     "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
+    "jsEngine": "hermes",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "jsEngine": "jsc"
+      "backgroundColor": "#ffffff"
 
     },
     "ios": {
@@ -23,9 +23,8 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "fonts": [
-      "./assets/Fonts/Coolvetica Rg.otf",
-      "./assets/Fonts/Neuton-Light.ttf"
+    "plugins": [
+      ["expo-notifications"]
     ]
   }
 }
