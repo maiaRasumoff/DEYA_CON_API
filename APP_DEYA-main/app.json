@@ -1,5 +1,6 @@
 {
   "expo": {
+    "sdkVersion": "52.0.0",
     "name": "DEYA_APP",
     "slug": "DEYA_APP",
     "version": "1.0.0",
@@ -15,10 +16,22 @@
 
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyCZtqhTR7vEXaVHSLHY7j47LpLGU_u2bhk"
+      }
     },
     "android": {
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCZtqhTR7vEXaVHSLHY7j47LpLGU_u2bhk"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

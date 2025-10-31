@@ -1,4 +1,5 @@
 import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
 // Configure how notifications are handled when received in foreground
@@ -12,6 +13,10 @@ Notifications.setNotificationHandler({
 
 export async function registerForPushNotificationsAsync() {
   try {
+    if (!Device.isDevice) {
+      console.warn('Push notifications require a physical device');
+      return null;
+    }
     // Android requires a channel
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync('default', {

@@ -9,7 +9,8 @@ import WelcomeScreen from './WelcomeScreen';
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
-import PopupDetailScreen from './PopupDetailScreen';
+PopupDetailScreen from './PopupDetailScreen';
+import MapScreen from './screens/MapScreen';
 import EstilosScreen from './EstilosScreen';
 import BarriosScreen from './BarriosScreen';
 import PersonalizacionExitosaScreen from './PersonalizacionExitosaScreen';
@@ -47,6 +48,7 @@ export default function App() {
         <Stack.Screen name="BarriosScreen" component={BarriosScreen} />
         <Stack.Screen name="PersonalizacionExitosaScreen" component={PersonalizacionExitosaScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Explorar" component={MapScreen} />
         <Stack.Screen name="PopupDetailScreen" component={PopupDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>

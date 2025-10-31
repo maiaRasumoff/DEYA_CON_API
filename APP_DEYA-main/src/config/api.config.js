@@ -3,22 +3,15 @@
 
 // Función para obtener la IP automáticamente (opcional)
 const getLocalIP = () => {
-  // Puedes cambiar esta IP manualmente si es necesario
-  return '200.73.176.50'; // ← CAMBIA ESTA IP POR LA DE TU COMPUTADORA
+ 
+  return '192.168.30.45'; // ← CAMBIAR ESTA IP POR LA DE LA COMPU
 };
 
 export const API_CONFIG = {
-  // 🔧 CONFIGURACIÓN PRINCIPAL - CAMBIA ESTA IP:
-  BASE_URL: `http://${getLocalIP()}:3000/api`,
-  
-  // 📝 INSTRUCCIONES RÁPIDAS:
-  // 1. En tu nueva computadora, abre terminal/cmd
-  // 2. Ejecuta: ipconfig (Windows) o ifconfig (Mac/Linux)
-  // 3. Busca tu IP local (ej: 192.168.1.100)
-  // 4. Cambia la IP en la línea 8 de este archivo
-  
-  // Timeout para las peticiones (en milisegundos)
-  TIMEOUT: 10000,
+ 
+  // Usa HTTPS o túnel ngrok para dispositivos físicos
+  BASE_URL: 'https://TU_NGROK_TUNNEL_ID.ngrok-free.app/api',
+  // BASE_URL: `http://${getLocalIP()}:3000/api`,
   
   // Headers por defecto
   DEFAULT_HEADERS: {

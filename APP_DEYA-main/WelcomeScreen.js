@@ -15,8 +15,8 @@ const WelcomeScreen = ({ navigation }) => {
     const loadFonts = async () => {
       try {
         await Font.loadAsync({
-          Coolvetica: require('./assets/fonts/Coolvetica Rg.otf'),
-          Neuton: require('./assets/fonts/Neuton-Light.ttf'),
+          Coolvetica: require('./assets/Fonts/Coolvetica Rg.otf'),
+          Neuton: require('./assets/Fonts/Neuton-Light.ttf'),
         });
         if (isMounted) {
           fontsLoadedRef.current = true;

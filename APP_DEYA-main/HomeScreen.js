@@ -95,13 +95,14 @@ const TabBar = ({ current, onTab }) => (
       <Ionicons name="search" size={24} color={current === 'Explorar' ? '#34A853' : '#BDBDBD'} />
       <Text style={[styles.tabText, current === 'Explorar' && { color: '#34A853' }]}>Explorar</Text>
     </TouchableOpacity>
+    <View style={styles.qrWrapper}>
+      <TouchableOpacity style={styles.qrButton} onPress={() => onTab('QR')} accessibilityLabel="QR Scanner">
+        <Ionicons name="qr-code-outline" size={28} color="#fff" />
+      </TouchableOpacity>
+    </View>
     <TouchableOpacity style={styles.tabItem} onPress={() => onTab('Favoritos')}>
       <Ionicons name="heart-outline" size={24} color={current === 'Favoritos' ? '#34A853' : '#BDBDBD'} />
       <Text style={[styles.tabText, current === 'Favoritos' && { color: '#34A853' }]}>Favoritos</Text>
-    </TouchableOpacity>
-    <TouchableOpacity style={styles.tabItem} onPress={() => onTab('Notificacion')}>
-      <Ionicons name="notifications-outline" size={24} color={current === 'Notificacion' ? '#34A853' : '#BDBDBD'} />
-      <Text style={[styles.tabText, current === 'Notificacion' && { color: '#34A853' }]}>Notificación</Text>
     </TouchableOpacity>
     <TouchableOpacity style={styles.tabItem} onPress={() => onTab('Perfil')}>
       <Ionicons name="person-outline" size={24} color={current === 'Perfil' ? '#34A853' : '#BDBDBD'} />
@@ -198,7 +199,11 @@ const HomeScreen = () => {
             />
           )}
         </ScrollView>
-        <TabBar current="Home" onTab={() => {}} />
+        <TabBar current="Home" onTab={(tab) => {
+          if (tab === 'Explorar') {
+            navigation.navigate('Explorar');
+          }
+        }} />
       </SafeAreaView>
     </SafeAreaProvider>
   );
@@ -380,6 +385,19 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -2 },
     shadowRadius: 8,
     elevation: 10,
+  },
+  qrWrapper: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  qrButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#34A853',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   tabItem: {
     alignItems: 'center',
