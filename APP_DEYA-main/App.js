@@ -9,7 +9,7 @@ import WelcomeScreen from './WelcomeScreen';
 import RegisterScreen from './RegisterScreen';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
-PopupDetailScreen from './PopupDetailScreen';
+import PopupDetailScreen from './PopupDetailScreen';
 import MapScreen from './screens/MapScreen';
 import EstilosScreen from './EstilosScreen';
 import BarriosScreen from './BarriosScreen';
