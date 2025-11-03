@@ -15,6 +15,7 @@ import EstilosScreen from './EstilosScreen';
 import BarriosScreen from './BarriosScreen';
 import PersonalizacionExitosaScreen from './PersonalizacionExitosaScreen';
 import { registerForPushNotificationsAsync } from './src/utils/notifications';
+import QRIntroScreen from './src/screens/QR/QRIntroScreen';
 
 const Stack = createStackNavigator();
 
@@ -50,6 +51,7 @@ export default function App() {
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Explorar" component={MapScreen} />
         <Stack.Screen name="PopupDetailScreen" component={PopupDetailScreen} />
+        <Stack.Screen name="QRIntro" component={QRIntroScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

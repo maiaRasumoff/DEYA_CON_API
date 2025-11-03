@@ -202,6 +202,8 @@ const HomeScreen = () => {
         <TabBar current="Home" onTab={(tab) => {
           if (tab === 'Explorar') {
             navigation.navigate('Explorar');
+          } else if (tab === 'QR') {
+            navigation.navigate('QRIntro');
           }
         }} />
       </SafeAreaView>
