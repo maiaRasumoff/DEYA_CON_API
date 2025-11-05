@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, ImageBackground, StyleSheet, Alert, ActivityIndicator, Platform, ToastAndroid } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import supabase from './lib/supabase';
 
 const LoginScreen = () => {
@@ -10,6 +11,19 @@ const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleCopyEmail = async () => {
+    try {
+      await Clipboard.setStringAsync(email);
+      if (Platform.OS === 'android') {
+        ToastAndroid.show('Email copiado', ToastAndroid.SHORT);
+      } else {
+        Alert.alert('Email copiado');
+      }
+    } catch (err) {
+      Alert.alert('Error', 'No se pudo copiar al portapapeles.');
+    }
+  };
 
   const handleLogin = async () => {
     const emailTrimmed = email.trim().toLowerCase();
@@ -69,17 +83,27 @@ const LoginScreen = () => {
         <Text style={styles.title}>Inicia Sesión en</Text>
         <Text style={styles.brandTitle}>Deyá</Text>
         <View style={styles.card}>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          accessible
-          accessibilityLabel="Campo de email"
-        />
+        <View style={styles.inputWithIconContainer}>
+          <TextInput
+            style={[styles.input, { flex: 1, marginBottom: 0 }]}
+            placeholder="Email"
+            placeholderTextColor="#aaa"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            accessible
+            accessibilityLabel="Campo de email"
+          />
+          <TouchableOpacity
+            style={styles.copyIcon}
+            onPress={handleCopyEmail}
+            accessible
+            accessibilityLabel="Copiar email"
+          >
+            <Ionicons name="copy-outline" size={20} color="#888" />
+          </TouchableOpacity>
+        </View>
         <View style={styles.passwordContainer}>
           <TextInput
             style={[styles.input, { flex: 1, marginBottom: 0 }]}
@@ -174,6 +198,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  inputWithIconContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '70%',
+  },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -181,6 +211,11 @@ const styles = StyleSheet.create({
     width: '70%',
   },
   eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    top: 14,
+  },
+  copyIcon: {
     position: 'absolute',
     right: 16,
     top: 14,
