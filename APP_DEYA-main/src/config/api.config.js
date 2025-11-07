@@ -2,12 +2,12 @@
 // 🚨 IMPORTANTE: Cambia la IP según tu computadora para la presentación
 
 // Función para obtener la IP automáticamente (opcional)
-const getLocalIP = () => {
+/*const getLocalIP = () => {
  
   return '192.168.30.45'; // ← CAMBIAR ESTA IP POR LA DE LA COMPU
-};
+};*/
 
-export const API_CONFIG = {
+/*export const API_CONFIG = {
  
   // Usa HTTPS o túnel ngrok para dispositivos físicos
   BASE_URL: 'https://TU_NGROK_TUNNEL_ID.ngrok-free.app/api',
@@ -17,6 +17,11 @@ export const API_CONFIG = {
   DEFAULT_HEADERS: {
     'Content-Type': 'application/json',
   },
+};*/
+
+export const API_CONFIG = {
+  BASE_URL: 'http://192.168.0.15:3000/api',
+  DEFAULT_HEADERS: { 'Content-Type': 'application/json' },
 };
 
 // Para desarrollo local, puedes usar:
