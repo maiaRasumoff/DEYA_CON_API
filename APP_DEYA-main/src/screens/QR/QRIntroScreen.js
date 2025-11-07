@@ -25,7 +25,7 @@ const QRIntroScreen = ({ navigation }) => {
             <Text style={[styles.descriptionText, { fontFamily: 'Coolvetica' }]}> 
               Escanea los QRs de los eventos de <Text style={styles.italic}>POP-UPs</Text> y gana puntos y recompensas de la marca.
             </Text>
-            <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('QRScanner')}>
               <Text style={[styles.ctaText, { fontFamily: 'Coolvetica' }]}>Continuar</Text>
             </TouchableOpacity>
           </BlurView>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   italic: {
-    fontStyle: 'italiexplc',
+    fontStyle: 'italic',
   },
   ctaButton: {
     backgroundColor: '#E2A9D9',
